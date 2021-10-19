@@ -13,6 +13,7 @@ class UserSeeder extends Seeder
         $data = [
             [
                 "name" => "ADMIN PRINCIPAL",
+                "birthday" => "1990-01-01",
                 "email" => "admin@svr.com",
                 "password" => bcrypt("12345678"),
                 "created_by_id" => 1,

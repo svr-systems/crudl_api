@@ -52,6 +52,7 @@ class UserController extends Controller
                 $request->all(),
                 [
                     "name" => "string|required|min:2|max:45",
+                    "birthday" => "date|required",
                     "email" => "string|required|email|min:6|max:65|unique:users",
                     "password" => "string|required|min:5|max:20",
                     "role_id" => "required"
@@ -71,6 +72,7 @@ class UserController extends Controller
             //STORE DATA
             User::create([
                 "name" => mb_strtoupper(trim($request->name), "UTF-8"),
+                "birthday" => trim($request->birthday),
                 "email" => mb_strtolower(trim($request->email), "UTF-8"),
                 "password" => bcrypt(trim($request->password)),
                 "created_by_id" => $request->created_by_id,
@@ -131,6 +133,7 @@ class UserController extends Controller
                 $request->all(),
                 [
                     "name" => "string|required|min:2|max:45",
+                    "birthday" => "date|required",
                     "role_id" => "required",
                     "email" => "string|required|email|min:6|max:65|unique:users,email," . $id,
                 ],
@@ -149,6 +152,7 @@ class UserController extends Controller
             //UPDATE DATA
             User::where("id", $id)->update([
                 "name" => mb_strtoupper(trim($request->name), "UTF-8"),
+                "birthday" => trim($request->birthday),
                 "email" => mb_strtolower(trim($request->email), "UTF-8"),
                 "updated_by_id" => $request->updated_by_id,
                 "role_id" => $request->role_id
