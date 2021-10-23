@@ -69,8 +69,26 @@ class UserController extends Controller
                 ], 200);
             }
 
+            //VALIDATION FILE 1
+            $avatar_file = $request->file("avatar_file");
+
+            if ($avatar_file) {
+                $validator = Validator::make(
+                    $request->all(),
+                    ["avatar_file" => "image|mimes:jpeg,jpg|max:2048"],
+                    ["avatar_file.max" => "El tamaño máximo de la Imagen de perfil es de 2MB"]
+                );
+
+                if ($validator->fails()) {
+                    return response()->json([
+                        "success" => false,
+                        "message" => $validator->errors()->first()
+                    ], 200);
+                }
+            }
+
             //STORE DATA
-            User::create([
+            $insert = User::create([
                 "name" => mb_strtoupper(trim($request->name), "UTF-8"),
                 "birthday" => trim($request->birthday),
                 "email" => mb_strtolower(trim($request->email), "UTF-8"),
@@ -79,6 +97,14 @@ class UserController extends Controller
                 "updated_by_id" => $request->created_by_id,
                 "role_id" => $request->role_id
             ]);
+
+            //UPLOAD FILES
+            $path = "public/users/{$insert->id}/avatar";
+            Storage::makeDirectory($path);
+
+            if ($avatar_file) {
+                $avatar_file->store($path);
+            }
 
             //RETURN SUCCESS
             return response()->json([
@@ -108,6 +134,19 @@ class UserController extends Controller
                 ->join("users AS uu", "uu.id", "=", "x.updated_by_id")
                 ->where("x.id", $id)
                 ->get();
+
+            $data = $data[0];
+
+            $path = "public/users/{$id}/avatar";
+            $avatar_file = Storage::files($path);
+
+            if (count($avatar_file) > 0) {
+                $avatar_file = Str::substr($avatar_file[0], 7);
+            } else {
+                $avatar_file = "";
+            }
+
+            $data->avatar_file = $avatar_file;
 
             return response()->json([
                 "success" => true,
